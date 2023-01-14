@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Dynamic Item List</title>
+	<style>
+		/* Table styling */
+		table {
+			border-collapse: collapse;
+			width: 100%;
+		}
+		th, td {
+			border: 1px solid black;
+			padding: 8px;
+			text-align: center;
+		}
+		th {
+			background-color: #f2f2f2;
+		}
+		/* Add button styling */
+		.add-btn {
+			background-color: green;
+			color: white;
+			padding: 8px 16px;
+			border: none;
+			cursor: pointer;
+		}
+		/* Clear button styling */
+		.clear-btn {
+			background-color: red;
+			color: white;
+			padding: 8px 16px;
+			border: none;
+			cursor: pointer;
+			margin-left: 10px;
+		}
+		/* Delete button styling */
+		.delete-btn {
+			background-color: gray;
+			color: white;
+			padding: 8px 16px;
+			border: none;
+			cursor: pointer;
+		}
+		/* Add item modal styling */
+		#add-item-modal {
+			display: none;
+			position: fixed;
+			z-index: 1;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			overflow: auto;
+			background-color: rgba(0,0,0,0.4);
+		}
+		.modal-content {
+			background-color: #fefefe;
+			margin: 15% auto;
+			padding: 20px;
+			border: 1px solid #888;
+			width: 80%;
+		}
+		.modal-header {
+			text-align: center;
+			margin-bottom: 20px;
+		}
+		.modal-footer {
+			text-align: center;
+			margin-top: 20px;
+		}
+		.modal-input {
+			margin-bottom: 10px;
+			padding: 8px;
+			width: 100%;
+			box-sizing: border-box;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+		}
+		.modal-select {
+			margin-bottom: 10px;
+			padding: 8px;
+			width: 100%;
+			box-sizing: border-box;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+		}
+		.modal-submit-btn {
+			background-color: green;color: white;
+padding: 8px 16px;
+border: none;
+cursor: pointer;
+margin-right: 10px;
+}
+.modal-cancel-btn {
+background-color: gray;
+color: white;
+padding: 8px 16px;
+border: none;
+cursor: pointer;
+}
+</style>
+
+</head>
+<body>
+	<table id="item-list">
+		<tr>
+			<th>Qty</th>
+			<th>Item</th>
+			<th>Price</th>
+			<th>Amount</th>
+			<th>Actions</th>
+		</tr>
+		<tr id="total-row">
+			<td colspan="3">TOTAL</td>
+			<td id="total-amount"></td>
+			<td></td>
+		</tr>
+	</table>
+	<button class="add-btn" onclick="openAddItemModal()">Add Item</button>
+	<button class="clear-btn" onclick="clearItemList()">Clear</button>
+  <!-- Add Item Modal -->
+<div id="add-item-modal" class="modal">
+	<div class="modal-content">
+		<div class="modal-header">
+			<h2>Add Item</h2>
+		</div>
+		<form onsubmit="addItemToList(); return false;">
+			<label for="qty-input">Qty:</label>
+			<input type="number" id="qty-input" class="modal-input" required>
+			<label for="item-select">Item:</label>
+			<select id="item-select" class="modal-select" required>
+				<option value="Product A">Product A</option>
+				<option value="Product B">Product B</option>
+				<option value="Product C">Product C</option>
+			</select>
+			<label for="price-input">Price:</label>
+			<input type="number" id="price-input" class="modal-input" required>
+			<div class="modal-footer">
+				<button type="submit" class="modal-submit-btn">Add</button>
+				<button type="button" class="modal-cancel-btn" onclick="closeAddItemModal()">Cancel</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script>
+	var itemList = document.getElementById("item-list");
+	var totalAmount = document.getElementById("total-amount");
+	var total = 0;
+
+	function openAddItemModal() {
+		document.getElementById("add-item-modal").style.display = "block";
+}
+function closeAddItemModal() {
+		document.getElementById("add-item-modal").style.display = "none";
+	}
+
+	function addItemToList() {
+		var qty = document.getElementById("qty-input").value;
+		var item = document.getElementById("item-select").value;
+		var price = document.getElementById("price-input").value;
+		var amount = qty * price;
+		total += amount;
+
+		var row = itemList.insertRow(-1);
+		var qtyCell = row.insertCell(0);
+		var itemCell = row.insertCell(1);
+		var priceCell = row.insertCell(2);
+		var amountCell = row.insertCell(3);
+		var actionsCell = row.insertCell(4);
+
+		qtyCell.innerHTML = qty;
+		itemCell.innerHTML = item;
+		priceCell.innerHTML = price;
+		amountCell.innerHTML = amount;
+		actionsCell.innerHTML = '<button class="delete-btn" onclick="deleteItem(this)">Delete</button>';
+
+		totalAmount.innerHTML = total;
+
+		document.getElementById("qty-input").value = "";
+		document.getElementById("price-input").value = "";
+		document.getElementById("add-item-modal").style.display = "none";
+	}
+
+	function deleteItem(btn) {
+		var row = btn.parentNode.parentNode;
+		var amount = row.cells[3].innerHTML;
+		total -= amount;
+		totalAmount.innerHTML = total;
+		row.parentNode.removeChild(row);
+	}
+
+	function clearItemList() {
+		while (itemList.rows.length > 2) {
+			itemList.deleteRow(-1);
+		}
+		total = 0;
+		totalAmount.innerHTML = total;
+	}
+</script>
+</body>
+</html>
